@@ -41,7 +41,7 @@ def create_shadow_copy(volume_path):
         logger.info(f"Attempting to create VSS for volume: {volume_path}")
         wmi_service = win32com.client.GetObject("winmgmts:\\\\.\\root\\cimv2")
         shadow_copy_class = wmi_service.Get("Win32_ShadowCopy")
-        in_params = shadow_copy_class.Methods_("Create").InParameters. SpawnInstance_()
+        in_params = shadow_copy_class.Methods_("Create").InParameters.SpawnInstance_()
         in_params.Volume = volume_path
         in_params.Context = "ClientAccessible"
         logger.debug("Executing WMI Win32_ShadowCopy. Create method...")
@@ -54,11 +54,11 @@ def create_shadow_copy(volume_path):
             logger.debug(f"Querying for shadow copy details: {shadow_copy_query}")
             shadow_copy = wmi_service.ExecQuery(shadow_copy_query)[0]
             shadow_path_raw = shadow_copy.DeviceObject
-            shadow_path = shadow_path_raw.replace("\\\\? \\", "\\\\. \\", 1)
+            shadow_path = shadow_path_raw.replace("\\\\?\\", "\\\\.\\", 1)
             logger.debug(f"Shadow Copy Device Path: {shadow_path}")
         else:
-            err_msg = f"Failed to create VSS.  WMI ReturnValue: {out_params. ReturnValue}"
-            logger. error(err_msg)
+            err_msg = f"Failed to create VSS. WMI ReturnValue: {out_params.ReturnValue}"
+            logger.error(err_msg)
             raise Exception(err_msg)
 
     except Exception as e:
@@ -77,9 +77,9 @@ def extract_live_file(source, destination):
     logger.debug(f"Called extract_live_file with source: {source}, destination: {destination}")
     output = ""
     try:
-        esentutl_path = pathlib.Path(os.environ. get("COMSPEC", "C:\\Windows\\System32\\cmd. exe")).parent. joinpath("esentutl. exe")
+        esentutl_path = pathlib.Path(os.environ.get("COMSPEC", "C:\\Windows\\System32\\cmd.exe")).parent.joinpath("esentutl.exe")
         logger.debug(f"Using esentutl path: {esentutl_path}")
-        if not esentutl_path. is_file():
+        if not esentutl_path.is_file():
             err_msg = f"esentutl.exe not found at {esentutl_path}"
             logger.error(err_msg)
             raise FileNotFoundError(err_msg)
@@ -91,7 +91,7 @@ def extract_live_file(source, destination):
             raise FileNotFoundError(err_msg)
 
         cmdline = f'"{esentutl_path}" /y "{source}" /vss /d "{destination}"'
-        logger. info(f"Executing esentutl command: {cmdline}")
+        logger.info(f"Executing esentutl command: {cmdline}")
         result = subprocess.run(cmdline, shell=True, capture_output=True, text=True, check=False)
         output = result.stdout + result.stderr
         logger.debug(f"esentutl stdout: {result.stdout}")
@@ -155,7 +155,7 @@ def confirm_srum_nodes(srum_path):
             raise FileNotFoundError(err_msg)
 
         command = f'"{esentutl_path}" /g "{srum_path}"'
-        logger. info(f"Executing integrity check command: {command}")
+        logger.info(f"Executing integrity check command: {command}")
 
         result = subprocess.run(
             command,
@@ -172,7 +172,7 @@ def confirm_srum_nodes(srum_path):
 
         is_intact = result.returncode == 0
         if is_intact:
-            logger. info(f"SRUM database integrity check passed for:  {srum_path}")
+            logger.info(f"SRUM database integrity check passed for: {srum_path}")
         else:
             logger.warning(f"SRUM database integrity check failed for: {srum_path}. Exit code: {result.returncode}")
             error_match = re.search(r"error\s+(-?\d+)", full_output, re.IGNORECASE)
@@ -196,7 +196,7 @@ def confirm_srum_nodes(srum_path):
         full_output = error_msg
         is_intact = False
 
-    logger.debug(f"Returning from confirm_srum_nodes:  is_intact={is_intact}, output (truncated)='{full_output[:200]}.. .'")
+    logger.debug(f"Returning from confirm_srum_nodes: is_intact={is_intact}, output (truncated)='{full_output[:200]}...'")
     return is_intact, full_output
 
 
@@ -250,14 +250,14 @@ def confirm_srum_header(srum_path):
             if state_match:
                 state = state_match.group(1).strip()
                 logger.info(f"Database state reported as: '{state}'")
-                is_clean = state. lower() == "clean shutdown"
+                is_clean = state.lower() == "clean shutdown"
                 if not is_clean:
                     logger.warning(f"Database state is '{state}', not 'Clean Shutdown'.")
                     full_output += f"\n\nHeader Check Result: Database state is '{state}' (Expected 'Clean Shutdown')"
                 else:
                     logger.info("Database state is 'Clean Shutdown'.")
             else:
-                logger. error("Could not determine database state from esentutl /mh output.")
+                logger.error("Could not determine database state from esentutl /mh output.")
                 full_output += "\n\nError:  Could not determine database state from output"
                 is_clean = False
 
@@ -362,7 +362,7 @@ def verify_file_hashes(original, copy):
         logger.debug(f"Copy MD5: {copy_hash}")
 
         match = original_hash == copy_hash
-        logger.info(f"Hash comparison result for {original_path. name}: {'Match' if match else 'Mismatch'}")
+        logger.info(f"Hash comparison result for {original_path.name}: {'Match' if match else 'Mismatch'}")
 
     except Exception as e:
         logger.exception(f"Error calculating or comparing file hashes: {e}")
@@ -372,11 +372,11 @@ def verify_file_hashes(original, copy):
     return match
 
 
-def copy_locked_files(destination_folder:  pathlib.Path):
+def copy_locked_files(destination_folder: pathlib.Path):
     """
-    Copies locked SRUM and SOFTWARE files using VSS.  Windows only.
-    
-    : param destination_folder: Path to save the copied files
+    Copies locked SRUM and SOFTWARE files using VSS. Windows only.
+
+    :param destination_folder: Path to save the copied files
     """
     if not WINDOWS_AVAILABLE: 
         raise NotImplementedError("Copying locked files is only supported on Windows")
@@ -440,11 +440,11 @@ def copy_locked_files(destination_folder:  pathlib.Path):
                 ui_window.log_message("Close this Window to proceed.")
                 ui_window.finished()
                 try:
-                    ui_window. root.mainloop()
+                    ui_window.root.mainloop()
                 except Exception as ui_ex:
-                    logger. error(f"Error during final UI mainloop: {ui_ex}")
+                    logger.error(f"Error during final UI mainloop: {ui_ex}")
             else:
-                ui_window. close()
+                ui_window.close()
 
     logger.info(f"copy_locked_files finished with overall success status: {success}")
     return success

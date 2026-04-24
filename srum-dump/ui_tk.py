@@ -58,7 +58,7 @@ class ProgressWindow:
             self.root = tk.Tk()
             self.root.title(title)
             self.root.geometry("600x400")
-            self.root. after(2000, self.remove_topmost, self.root)
+            self.root.after(2000, self.remove_topmost, self.root)
             try:
                 self.root.iconbitmap(icon_path)
             except tk.TclError:
@@ -66,7 +66,7 @@ class ProgressWindow:
 
             # Current table label
             self.table_label = tk.Label(self.root, text="Preparing to dump tables .. .", font=('Arial', 10))
-            self.table_label. pack(pady=5)
+            self.table_label.pack(pady=5)
 
             # Progress bar frame
             progress_frame = tk.Frame(self.root)
@@ -87,16 +87,16 @@ class ProgressWindow:
             # Records dumped
             self.records_var = tk.StringVar(value="Records Dumped: 0")
             self.records_label = tk.Label(stats_frame, textvariable=self.records_var)
-            self.records_label. pack(side=tk.LEFT, padx=10)
+            self.records_label.pack(side=tk.LEFT, padx=10)
 
             # Records per second
             self.rps_var = tk.StringVar(value="Records/sec: 0")
             self.rps_label = tk.Label(stats_frame, textvariable=self.rps_var)
-            self.rps_label.pack(side=tk. RIGHT, padx=10)
+            self.rps_label.pack(side=tk.RIGHT, padx=10)
 
             # Log text area
             log_frame = tk.Frame(self.root)
-            log_frame.pack(fill=tk. BOTH, expand=True, padx=20, pady=5)
+            log_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=5)
 
             # Scrollbar
             scrollbar = tk.Scrollbar(log_frame)
@@ -131,7 +131,7 @@ class ProgressWindow:
         logger.debug(f"Starting ProgressWindow with total_tables: {total_tables}")
         try:
             self.total_tables = total_tables
-            self. current_table = 0
+            self.current_table = 0
             self.progress_var.set(0)
             self.update()
             logger.debug("ProgressWindow started.")
@@ -147,7 +147,7 @@ class ProgressWindow:
             else:
                 logger.warning("Window does not exist in remove_topmost.")
         except Exception as e:
-            logger. exception(f"Error removing topmost attribute: {e}")
+            logger.exception(f"Error removing topmost attribute: {e}")
 
     def set_current_table(self, table_name):
         """Update the current table being processed"""
@@ -158,7 +158,7 @@ class ProgressWindow:
             if self.total_tables > 0:
                 progress_percent = (self.current_table / self.total_tables) * 100
                 self.progress_var.set(progress_percent)
-                logger.debug(f"Progress set to {progress_percent:. 2f}%")
+                logger.debug(f"Progress set to {progress_percent:.2f}%")
             else:
                 logger.warning("Total tables is 0, cannot calculate progress percentage.")
             self.update()
@@ -169,8 +169,8 @@ class ProgressWindow:
         """Update the statistics display"""
         logger.debug(f"Updating stats: records_dumped={records_dumped}, records_per_second={records_per_second}")
         try:
-            self.records_var. set(f"Records Dumped: {records_dumped: ,}")
-            self.rps_var.set(f"Records/sec: {records_per_second:. 1f}")
+            self.records_var.set(f"Records Dumped: {records_dumped:,}")
+            self.rps_var.set(f"Records/sec: {records_per_second:.1f}")
             self.update()
         except Exception as e: 
             logger.exception(f"Error in update_stats: {e}")
@@ -205,9 +205,9 @@ class ProgressWindow:
         """Hide the records stats labels"""
         logger.debug("Called hide_record_stats")
         try:
-            if self.records_label. winfo_exists():
+            if self.records_label.winfo_exists():
                 self.records_label.pack_forget()
-            if self.rps_label. winfo_exists():
+            if self.rps_label.winfo_exists():
                 self.rps_label.pack_forget()
             logger.debug("Record stats hidden.")
         except Exception as e:
@@ -223,7 +223,7 @@ class ProgressWindow:
                 self.close_button.bind("<Leave>", lambda e: self.close_button.config(bg="#f0f0f0"))
                 logger.debug("Close button enabled.")
             else:
-                logger. warning("Close button does not exist in finished.")
+                logger.warning("Close button does not exist in finished.")
         except Exception as e:
             logger.exception(f"Error in finished method: {e}")
 
@@ -241,7 +241,7 @@ class ProgressWindow:
 
 
 def error_message_box(title, message):
-    logger.debug(f"Called error_message_box with title: {title}, message: {message[: 50]}...")
+    logger.debug(f"Called error_message_box with title: {title}, message: {message[:50]}...")
     try:
         messagebox.showerror(title, message)
         logger.info(f"Displayed error message box with title: {title}")
@@ -263,7 +263,7 @@ def browse_file(initial_dir, filetypes):
     file_path = ""
     root = None
     try:
-        root = tk. Tk()
+        root = tk.Tk()
         root.withdraw()
         logger.debug("Temporary Tk root created and withdrawn.")
         resolved_initial_dir = str(pathlib.Path(initial_dir).resolve())
@@ -272,7 +272,7 @@ def browse_file(initial_dir, filetypes):
         logger.info(f"File dialog returned: {file_path}")
         if file_path:
             canonical_path = str(pathlib.Path(file_path).resolve())
-            logger. debug(f"Canonicalized path: {canonical_path}")
+            logger.debug(f"Canonicalized path: {canonical_path}")
             return canonical_path
         else: 
             logger.debug("No file selected.")
@@ -297,7 +297,7 @@ def browse_directory(initial_dir):
         root = tk.Tk()
         root.withdraw()
         logger.debug("Temporary Tk root created and withdrawn.")
-        resolved_initial_dir = str(pathlib. Path(initial_dir).resolve())
+        resolved_initial_dir = str(pathlib.Path(initial_dir).resolve())
         logger.debug(f"Resolved initial directory: {resolved_initial_dir}")
         directory_path = filedialog.askdirectory(initialdir=resolved_initial_dir)
         logger.info(f"Directory dialog returned:  {directory_path}")
@@ -317,7 +317,7 @@ def browse_directory(initial_dir):
                 root.destroy()
                 logger.debug("Temporary Tk root destroyed.")
             except Exception as destroy_e:
-                logger. warning(f"Error destroying temporary Tk root in browse_directory: {destroy_e}")
+                logger.warning(f"Error destroying temporary Tk root in browse_directory: {destroy_e}")
 
 
 def get_user_input(options):
@@ -385,7 +385,7 @@ def get_user_input(options):
             # Validate paths
             valid = True
             if not pathlib.Path(out_dir).is_dir():
-                logger. error(f"Validation failed: Output directory does not exist: {out_dir}")
+                logger.error(f"Validation failed: Output directory does not exist: {out_dir}")
                 messagebox.showerror("Error", f"Output directory specified does not exist:\n{out_dir}")
                 valid = False
 
@@ -417,7 +417,7 @@ def get_user_input(options):
         except tk.TclError:
             logger.exception("Icon file not found or invalid.")
 
-        image_path = os.path.join(base_path, 'srum-dump. png')
+        image_path = os.path.join(base_path, 'srum-dump.png')
         logger.debug(f"Image path: {image_path}")
 
         # Logo
@@ -443,19 +443,19 @@ def get_user_input(options):
             'height': 1,
             'padx': 5,
             'pady': 5,
-            'relief': tk. RAISED,
+            'relief': tk.RAISED,
             'borderwidth': 2,
             'bg': '#f0f0f0',
             'activebackground': '#e0e0e0'
         }
 
         # Configuration File section
-        config_frame = tk. LabelFrame(content_frame, text='Configuration File:')
+        config_frame = tk.LabelFrame(content_frame, text='Configuration File:')
         config_frame.pack(fill=tk.X, pady=5, padx=5)
         config_input_frame = tk.Frame(config_frame)
         config_input_frame.pack(fill=tk.X, padx=5, pady=5)
         config_file_label = tk.Label(config_input_frame, width=80, anchor=tk.W, bg="lightgray", relief=tk.SUNKEN)
-        config_file_label.pack(side=tk. LEFT, expand=True, fill=tk.X, pady=5)
+        config_file_label.pack(side=tk.LEFT, expand=True, fill=tk.X, pady=5)
         config_file_label.config(text=initial_config_file)
         
         edit_btn = tk.Button(
@@ -466,22 +466,22 @@ def get_user_input(options):
         )
         edit_btn.pack(side=tk.LEFT, padx=5)
         edit_btn.bind("<Enter>", lambda e: edit_btn.config(bg="#e0e0e0"))
-        edit_btn.bind("<Leave>", lambda e: edit_btn. config(bg="#f0f0f0"))
+        edit_btn.bind("<Leave>", lambda e: edit_btn.config(bg="#f0f0f0"))
 
         # Output Directory section
         output_frame = tk.LabelFrame(content_frame, text='Output folder:')
-        output_frame. pack(fill=tk.X, pady=5, padx=5)
+        output_frame.pack(fill=tk.X, pady=5, padx=5)
         output_input_frame = tk.Frame(output_frame)
         output_input_frame.pack(fill=tk.X, padx=5, pady=5)
         out_dir_entry = tk.Entry(output_input_frame, width=80)
-        out_dir_entry. pack(side=tk.LEFT, expand=True, fill=tk. X, pady=5)
+        out_dir_entry.pack(side=tk.LEFT, expand=True, fill=tk.X, pady=5)
         out_dir_entry.insert(0, initial_out_dir)
         
         def browse_with_restore():
             initial_value = out_dir_entry.get()
             new_dir = browse_directory(out_dir_entry.get() or initial_out_dir)
             if new_dir:
-                out_dir_entry.delete(0, tk. END)
+                out_dir_entry.delete(0, tk.END)
                 out_dir_entry.insert(0, new_dir)
             else:
                 out_dir_entry.delete(0, tk.END)
@@ -493,7 +493,7 @@ def get_user_input(options):
             command=browse_with_restore,
             **button_config
         )
-        browse_btn.pack(side=tk. LEFT, padx=5)
+        browse_btn.pack(side=tk.LEFT, padx=5)
         browse_btn.bind("<Enter>", lambda e: browse_btn.config(bg="#e0e0e0"))
         browse_btn.bind("<Leave>", lambda e: browse_btn.config(bg="#f0f0f0"))
 
@@ -515,7 +515,7 @@ def get_user_input(options):
         )
         confirm_btn.pack(side=tk.LEFT, padx=10)
         confirm_btn.bind("<Enter>", lambda e: confirm_btn.config(bg="#e0e0e0"))
-        confirm_btn.bind("<Leave>", lambda e: confirm_btn. config(bg="#f0f0f0"))
+        confirm_btn.bind("<Leave>", lambda e: confirm_btn.config(bg="#f0f0f0"))
 
         cancel_btn = tk.Button(
             button_frame,
@@ -523,9 +523,9 @@ def get_user_input(options):
             command=on_cancel,
             **button_config
         )
-        cancel_btn. pack(side=tk.LEFT, padx=10)
+        cancel_btn.pack(side=tk.LEFT, padx=10)
         cancel_btn.bind("<Enter>", lambda e: cancel_btn.config(bg="#e0e0e0"))
-        cancel_btn. bind("<Leave>", lambda e:  cancel_btn.config(bg="#f0f0f0"))
+        cancel_btn.bind("<Leave>", lambda e: cancel_btn.config(bg="#f0f0f0"))
 
         logger.debug("Starting main input window mainloop.")
         root.mainloop()
