@@ -21,7 +21,7 @@ try:
     from ui_tk import get_user_input, get_input_wizard, error_message_box, ProgressWindow
     UI_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"UI not available:  {e}. Running in headless mode.")
+    logger.warning(f"UI not available: {e}. Running in headless mode.")
     UI_AVAILABLE = False
     # Create stub functions for headless mode
     def error_message_box(title, message):
@@ -33,7 +33,7 @@ except ImportError as e:
             self.root = None
         def start(self, total): pass
         def set_current_table(self, name): 
-            print(f"Processing:  {name}")
+            print(f"Processing: {name}")
         def log_message(self, msg): 
             print(msg)
         def update_stats(self, records, rps): pass
@@ -42,12 +42,12 @@ except ImportError as e:
     
     def get_user_input(options):
         """Stub for headless mode - should not be called with -q flag"""
-        error_message_box("Error", "GUI not available.  Please use --NO_CONFIRM (-q) flag.")
+        error_message_box("Error", "GUI not available. Please use --NO_CONFIRM (-q) flag.")
         sys.exit(1)
     
     def get_input_wizard(options):
         """Stub for headless mode - should not be called with -q flag"""
-        error_message_box("Error", "GUI not available. Please provide all arguments:  -i, -o")
+        error_message_box("Error", "GUI not available. Please provide all arguments: -i, -o")
         sys.exit(1)
 
 # Try to import copy_locked, but make it optional (Windows-only)
@@ -55,7 +55,7 @@ try:
     import copy_locked
     COPY_LOCKED_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"copy_locked not available: {e}.  Live file extraction disabled.")
+    logger.warning(f"copy_locked not available: {e}. Live file extraction disabled.")
     COPY_LOCKED_AVAILABLE = False
 
 # Try to import ctypes for admin check, but make it optional
@@ -64,17 +64,17 @@ try:
     CTYPES_AVAILABLE = True
 except ImportError: 
     CTYPES_AVAILABLE = False
-    logger.warning("ctypes not available.  Admin checks disabled.")
+    logger.warning("ctypes not available. Admin checks disabled.")
 
 from config_manager import ConfigManager
 
 
 parser = argparse.ArgumentParser(description="Given an SRUM database it will create an XLS spreadsheet or CSV with analysis of the data in the database.")
-parser.add_argument("--SRUM_INFILE", "-i", help="Specify the ESE (. dat) file to analyze. Provide a valid path to the file.")
+parser.add_argument("--SRUM_INFILE", "-i", help="Specify the ESE (.dat) file to analyze. Provide a valid path to the file.")
 parser.add_argument("--OUT_DIR", "-o", help="Full path to a working output directory.")
 parser.add_argument("--REG_HIVE", "-r", help="If SOFTWARE registry hive is provided then the names of the network profiles will be resolved.")
-parser.add_argument("--ESE_ENGINE", "-e", choices=['pyesedb', 'dissect'], default=None, help="Corrupt file?  Try a different engine to see if it does better.  Options are pyesedb or dissect")
-parser.add_argument("--OUTPUT_FORMAT", "-f", choices=['xls', 'csv'], default=None, help="Specify the output format. Options are xls or csv.  Default is xls.")
+parser.add_argument("--ESE_ENGINE", "-e", choices=['pyesedb', 'dissect'], default=None, help="Corrupt file? Try a different engine to see if it does better. Options are pyesedb or dissect")
+parser.add_argument("--OUTPUT_FORMAT", "-f", choices=['xls', 'csv'], default=None, help="Specify the output format. Options are xls or csv. Default is xls.")
 parser.add_argument("--DEBUG","-v", action="store_true",help="Enable verbose logging in srum_dump.log")
 parser.add_argument("--NO_CONFIRM","-q", action="store_true",help="Do not show the confirmation dialog box.")
 options = parser.parse_args()
@@ -83,12 +83,12 @@ options = parser.parse_args()
 log_file_path = None # Initialize in case OUT_DIR isn't set initially
 logger.setLevel(logging.INFO) # INFO logging by default
 if options.DEBUG:
-    logger. setLevel(logging.DEBUG) # Unless you pass --DEBUG or -v
+    logger.setLevel(logging.DEBUG) # Unless you pass --DEBUG or -v
 # --- End Logging Setup ---
 
 #If an OUT_DIR was specified on the cli we check it for a config
 if options.OUT_DIR and options.SRUM_INFILE:
-    config_path = pathlib.Path(options. OUT_DIR).joinpath("srum_dump_config.json")
+    config_path = pathlib.Path(options.OUT_DIR).joinpath("srum_dump_config.json")
     
     # Create the output directory if it doesn't exist
     pathlib.Path(options.OUT_DIR).mkdir(parents=True, exist_ok=True)
@@ -96,13 +96,13 @@ if options.OUT_DIR and options.SRUM_INFILE:
     config = ConfigManager(config_path)
     
     # If config doesn't exist, create it with defaults
-    if not config_path. is_file():
+    if not config_path.is_file():
         logger.info("Creating new configuration file")
         if options.ESE_ENGINE == None:
             options.ESE_ENGINE = "dissect"
         if options.OUTPUT_FORMAT == None:
             options.OUTPUT_FORMAT = "xls"
-        config.set_config("dirty_words", helpers. dirty_words)
+        config.set_config("dirty_words", helpers.dirty_words)
         config.set_config("known_tables", helpers.known_tables)
         config.set_config("known_sids", helpers.known_sids)     
         config.set_config("network_interfaces", {})
@@ -111,15 +111,15 @@ if options.OUT_DIR and options.SRUM_INFILE:
         config.set_config("column_markups", helpers.column_markups)
         config.save()
     
-    options.OUT_DIR = str(config_path. parent)  # Ensure it's the directory containing config
+    options.OUT_DIR = str(config_path.parent)  # Ensure it's the directory containing config
 else:
-    if not UI_AVAILABLE and not (options. SRUM_INFILE and options.OUT_DIR):
+    if not UI_AVAILABLE and not (options.SRUM_INFILE and options.OUT_DIR):
         error_message_box("Error", "GUI not available. Please provide required arguments:  -i <SRUM_FILE> -o <OUTPUT_DIR>")
         sys.exit(1)
     
     if UI_AVAILABLE and not options.NO_CONFIRM:
         get_input_wizard(options)  # Get paths with wizard
-    elif not options. SRUM_INFILE or not options.OUT_DIR:  
+    elif not options.SRUM_INFILE or not options.OUT_DIR:  
         error_message_box("Error", "Required arguments missing. Use:  -i <SRUM_FILE> -o <OUTPUT_DIR> -q")
         sys.exit(1)
     
@@ -127,7 +127,7 @@ else:
     pathlib.Path(options.OUT_DIR).mkdir(parents=True, exist_ok=True)
     
     # Create a config
-    config_path = pathlib. Path(options.OUT_DIR).joinpath("srum_dump_config.json")
+    config_path = pathlib.Path(options.OUT_DIR).joinpath("srum_dump_config.json")
     config = ConfigManager(config_path)
     
     # There is no config so set some defaults
@@ -138,7 +138,7 @@ else:
             options.OUTPUT_FORMAT = "xls"
         config.set_config("dirty_words", helpers.dirty_words)
         config.set_config("known_tables", helpers.known_tables)
-        config.set_config("known_sids", helpers. known_sids)     
+        config.set_config("known_sids", helpers.known_sids)     
         config.set_config("network_interfaces", {})
         config.set_config("skip_tables", helpers.skip_tables)
         config.set_config("interface_types", helpers.interface_types)
@@ -148,13 +148,13 @@ else:
 
 # --- Configure File Handler ---
 # Now that OUT_DIR is guaranteed to be set, configure the file handler
-log_file_path = pathlib. Path(options.OUT_DIR).joinpath("srum_dump. log")
+log_file_path = pathlib.Path(options.OUT_DIR).joinpath("srum_dump.log")
 log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s')
 file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(log_formatter)
 logger.addHandler(file_handler)
-logger.info(f"Logging initialized.  Log file: {log_file_path}")
+logger.info(f"Logging initialized. Log file: {log_file_path}")
 logger.info(f"Using options: {options}")
 # --- End File Handler Configuration ---
 
@@ -170,7 +170,7 @@ if CTYPES_AVAILABLE and sys.platform == 'win32':
                 success = copy_locked.copy_locked_files(pathlib.Path(options.OUT_DIR))
                 options.SRUM_INFILE = str(pathlib.Path(options.OUT_DIR).joinpath("SRUDB.dat"))
                 options.REG_HIVE =  str(pathlib.Path(options.OUT_DIR).joinpath("SOFTWARE"))
-                options.OUT_DIR = str(pathlib. Path(options.OUT_DIR))
+                options.OUT_DIR = str(pathlib.Path(options.OUT_DIR))
                 if not success:
                     sys.exit(1)
             else:
@@ -214,7 +214,7 @@ config.delete_config("known_sids")
 config.set_config("SRUDbIdMapTable", ese_db.id_lookup)
 config.save() 
 
-#Let User confirm the settings and paths.   Then save for reuse next time
+#Let User confirm the settings and paths. Then save for reuse next time
 if not options.NO_CONFIRM:
     if UI_AVAILABLE:
         get_user_input(options)
@@ -248,7 +248,7 @@ ads = helpers.ads
 
 #Create the workbook / directory
 timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S") 
-results_path = pathlib.Path(options. OUT_DIR).joinpath(f"SRUM-DUMP-{timestamp}")
+results_path = pathlib.Path(options.OUT_DIR).joinpath(f"SRUM-DUMP-{timestamp}")
 workbook = output.new_workbook( results_path )
 
 #record time and record count for statistics
@@ -306,7 +306,7 @@ try:  # Start of the main processing block
             display_names.extend( calculated_columns.keys() )
             column_names.extend( calculated_columns.keys() )
 
-        #Set Column Widths.  Default to column name width - Override based on column_markups config
+        #Set Column Widths. Default to column name width - Override based on column_markups config
         #This must be done before the worksheet is created
         column_widths = [len(display_name) for display_name in display_names]
         for scol,swidth in specified_widths.items():
@@ -328,7 +328,7 @@ try:  # Start of the main processing block
                 if read_count % 1000 == 0:
                     elapsed_time = time.time() - start_time
                     if elapsed_time != 0:
-                        progress. update_stats(read_count, table_count // elapsed_time) 
+                        progress.update_stats(read_count, table_count // elapsed_time) 
 
                 #Format each column in the row           
                 for position, eachcol in enumerate(table_object.column_names):
@@ -340,21 +340,21 @@ try:  # Start of the main processing block
                         new_row.append( val )
                     elif out_format == "APPID":
                         val = app_ids.get(str(embedded_value),'')
-                        new_row. append( val )
+                        new_row.append( val )
                     elif out_format == "SID":
                         val = app_ids.get(str(embedded_value),'')
                         new_row.append(val)
                     elif out_format == "OLE":
                         val = helpers.ole_timestamp(embedded_value)
                         cell_formats[position] = "datetime"
-                        new_row. append( val )
+                        new_row.append( val )
                     elif out_format == "seconds":
                         val = embedded_value/86400.0
-                        new_row. append( val )
+                        new_row.append( val )
                     elif out_format[: 5] == "FILE: ":          
                         val = helpers.file_timestamp(embedded_value)
                         cell_formats[position] = "datetime"
-                        new_row. append(val)
+                        new_row.append(val)
                     elif out_format == "network_interface":
                         val = config.get_config('network_interfaces').get(str(embedded_value), embedded_value)
                         new_row.append( val )
@@ -366,8 +366,8 @@ try:  # Start of the main processing block
                     #Colorize the dirty word cells overriding any previous formatting
                     if isinstance(val, str):
                         for eachword in dirty_words: 
-                            if eachword. lower() in val.lower():
-                                cell_formats[position] = dirty_words. get(eachword)  
+                            if eachword.lower() in val.lower():
+                                cell_formats[position] = dirty_words.get(eachword)  
 
                     #Apply named style if it is defined in the column_markups
                     if not cell_formats[position] and eachcol in column_styles:
@@ -385,9 +385,9 @@ try:  # Start of the main processing block
                             result = base_row + number if operator == '+' else base_row - number
                             result = max(result, 0)
                             formula = formula.replace(calc, str(result))
-                        value = formula. replace('#ROW_NUM#', str(table_count + 1))
+                        value = formula.replace('#ROW_NUM#', str(table_count + 1))
                         new_row.append( value )
-                        cell_formats. append( current_markups.get(col).get("style") )
+                        cell_formats.append( current_markups.get(col).get("style") )
 
                 #add the new row to the table
                 output.new_entry(worksheet, new_row, cell_formats)
@@ -397,7 +397,7 @@ try:  # Start of the main processing block
             progress.log_message(f"Table {table_name} contained {table_count} records.\n")
 
     progress.set_current_table(f"Writing Output Files.")
-    progress.log_message(f"Writing Output Files...   Please be patient\n")
+    progress.log_message(f"Writing Output Files... Please be patient\n")
     progress.log_message(next(ads))
     output.save()
     progress.log_message(next(ads))
