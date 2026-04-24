@@ -16,6 +16,31 @@ import datetime
 # Import helpers first (no GUI dependencies)
 import helpers
 
+# Headless stub implementations
+def _headless_error_message_box(title, message):
+    print(f"ERROR: {title}\n{message}", file=sys.stderr)
+
+class _HeadlessProgressWindow:
+    """Stub ProgressWindow for headless/CLI mode"""
+    def __init__(self, title=""):
+        self.root = None
+    def start(self, total): pass
+    def set_current_table(self, name):
+        print(f"Processing:  {name}")
+    def log_message(self, msg):
+        print(msg)
+    def update_stats(self, records, rps): pass
+    def finished(self): pass
+    def close(self): pass
+
+def _headless_get_user_input(options):
+    _headless_error_message_box("Error", "GUI not available.  Please use --NO_CONFIRM (-q) flag.")
+    sys.exit(1)
+
+def _headless_get_input_wizard(options):
+    _headless_error_message_box("Error", "GUI not available. Please provide all arguments:  -i, -o")
+    sys.exit(1)
+
 # Try to import GUI components, but make them optional
 try:
     from ui_tk import get_user_input, get_input_wizard, error_message_box, ProgressWindow
@@ -23,32 +48,12 @@ try:
 except ImportError as e:
     logger.warning(f"UI not available:  {e}. Running in headless mode.")
     UI_AVAILABLE = False
-    # Create stub functions for headless mode
-    def error_message_box(title, message):
-        print(f"ERROR: {title}\n{message}", file=sys.stderr)
-    
-    class ProgressWindow:
-        """Stub ProgressWindow for headless mode"""
-        def __init__(self, title=""):
-            self.root = None
-        def start(self, total): pass
-        def set_current_table(self, name): 
-            print(f"Processing:  {name}")
-        def log_message(self, msg): 
-            print(msg)
-        def update_stats(self, records, rps): pass
-        def finished(self): pass
-        def close(self): pass
-    
-    def get_user_input(options):
-        """Stub for headless mode - should not be called with -q flag"""
-        error_message_box("Error", "GUI not available.  Please use --NO_CONFIRM (-q) flag.")
-        sys.exit(1)
-    
-    def get_input_wizard(options):
-        """Stub for headless mode - should not be called with -q flag"""
-        error_message_box("Error", "GUI not available. Please provide all arguments:  -i, -o")
-        sys.exit(1)
+
+if not UI_AVAILABLE:
+    error_message_box = _headless_error_message_box
+    ProgressWindow = _HeadlessProgressWindow
+    get_user_input = _headless_get_user_input
+    get_input_wizard = _headless_get_input_wizard
 
 # Try to import copy_locked, but make it optional (Windows-only)
 try:
@@ -78,6 +83,10 @@ parser.add_argument("--OUTPUT_FORMAT", "-f", choices=['xls', 'csv'], default=Non
 parser.add_argument("--DEBUG","-v", action="store_true",help="Enable verbose logging in srum_dump.log")
 parser.add_argument("--NO_CONFIRM","-q", action="store_true",help="Do not show the confirmation dialog box.")
 options = parser.parse_args()
+
+if options.NO_CONFIRM:
+    ProgressWindow = _HeadlessProgressWindow
+    error_message_box = _headless_error_message_box
 
 # --- Logging Setup ---
 log_file_path = None # Initialize in case OUT_DIR isn't set initially
