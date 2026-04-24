@@ -44,7 +44,7 @@ def create_shadow_copy(volume_path):
         in_params = shadow_copy_class.Methods_("Create").InParameters.SpawnInstance_()
         in_params.Volume = volume_path
         in_params.Context = "ClientAccessible"
-        logger.debug("Executing WMI Win32_ShadowCopy. Create method...")
+        logger.debug("Executing WMI Win32_ShadowCopy.Create method...")
         out_params = wmi_service.ExecMethod("Win32_ShadowCopy", "Create", in_params)
 
         if out_params.ReturnValue == 0:
@@ -98,7 +98,7 @@ def extract_live_file(source, destination):
         logger.debug(f"esentutl stderr: {result.stderr}")
 
         if result.returncode != 0:
-            err_msg = f"Failed to extract file '{source}'.  esentutl exited with code {result.returncode}.  Output: {output}"
+            err_msg = f"Failed to extract file '{source}'. esentutl exited with code {result.returncode}. Output: {output}"
             logger.error(err_msg)
             raise Exception(err_msg)
         else:
@@ -117,7 +117,7 @@ def extract_live_file(source, destination):
 
 # Mapping of common JET error codes to user-friendly descriptions
 JET_ERROR_MAP = {
-    -1018: "JET_errReadVerifyFailure:  Read verification error (checksum mismatch on a page)",
+    -1018: "JET_errReadVerifyFailure: Read verification error (checksum mismatch on a page)",
     -1019: "JET_errPageNotInitialized: Page not initialized (likely corruption)",
     -1022: "JET_errDiskIO: Disk I/O error (problem reading/writing to file)",
     -1206: "JET_errDatabaseCorrupted: Database is corrupted",
@@ -125,7 +125,7 @@ JET_ERROR_MAP = {
     -1003: "JET_errOutOfMemory: Out of memory during operation",
     -1032: "JET_errFileAccessDenied: Access denied to the database file",
     -1811: "JET_errFileNotFound: Database file not found",
-    0: "No error:  Operation completed successfully"
+    0: "No error: Operation completed successfully"
 }
 
 
@@ -148,7 +148,7 @@ def confirm_srum_nodes(srum_path):
     full_output = ""
     try:
         esentutl_path = pathlib.Path(os.environ.get("COMSPEC", "C:\\Windows\\System32\\cmd.exe")).parent.joinpath("esentutl.exe")
-        logger.debug(f"Using esentutl path:  {esentutl_path}")
+        logger.debug(f"Using esentutl path: {esentutl_path}")
         if not esentutl_path.is_file():
             err_msg = f"esentutl.exe not found at {esentutl_path}"
             logger.error(err_msg)
@@ -165,7 +165,7 @@ def confirm_srum_nodes(srum_path):
             check=False
         )
         logger.debug(f"esentutl /g stdout: {result.stdout}")
-        logger.debug(f"esentutl /g stderr:  {result.stderr}")
+        logger.debug(f"esentutl /g stderr: {result.stderr}")
         logger.debug(f"esentutl /g return code: {result.returncode}")
 
         full_output = result.stdout + result.stderr
@@ -180,7 +180,7 @@ def confirm_srum_nodes(srum_path):
                 error_code = int(error_match.group(1))
                 error_desc = JET_ERROR_MAP.get(error_code, f"Unknown JET error code: {error_code}")
                 logger.warning(f"Detected JET error code: {error_code} ({error_desc})")
-                full_output += f"\n\nTranslated Error:  {error_desc}"
+                full_output += f"\n\nTranslated Error: {error_desc}"
             else:
                 logger.warning("Could not extract specific JET error code from output.")
                 full_output += "\n\nTranslated Error: Could not determine specific JET error code."
@@ -219,7 +219,7 @@ def confirm_srum_header(srum_path):
     full_output = ""
     try:
         esentutl_path = pathlib.Path(os.environ.get("COMSPEC", "C:\\Windows\\System32\\cmd.exe")).parent.joinpath("esentutl.exe")
-        logger.debug(f"Using esentutl path:  {esentutl_path}")
+        logger.debug(f"Using esentutl path: {esentutl_path}")
         if not esentutl_path.is_file():
             err_msg = f"esentutl.exe not found at {esentutl_path}"
             logger.error(err_msg)
@@ -258,7 +258,7 @@ def confirm_srum_header(srum_path):
                     logger.info("Database state is 'Clean Shutdown'.")
             else:
                 logger.error("Could not determine database state from esentutl /mh output.")
-                full_output += "\n\nError:  Could not determine database state from output"
+                full_output += "\n\nError: Could not determine database state from output"
                 is_clean = False
 
     except FileNotFoundError as fnf_ex:
@@ -306,7 +306,7 @@ def verify_and_recopy_file(src, dest, ui_window):
     retry = 3
     max_retries = retry
     while retry > 0:
-        logger.info(f"Verifying hash for src: {src}, dest: {dest}.  Attempt {max_retries - retry + 1}/{max_retries}")
+        logger.info(f"Verifying hash for src: {src}, dest: {dest}. Attempt {max_retries - retry + 1}/{max_retries}")
         hashes_match = verify_file_hashes(src, dest)
         if hashes_match:
             logger.info(f"Hashes match for src: {src}, dest: {dest}")
@@ -327,7 +327,7 @@ def verify_and_recopy_file(src, dest, ui_window):
                 logger.error(f"Recopy attempt failed for {src}. Return code: {res.returncode}")
 
     if not success:
-        err_msg = f"Failed to copy and verify file after {max_retries} attempts:  src={src}, dest={dest}"
+        err_msg = f"Failed to copy and verify file after {max_retries} attempts: src={src}, dest={dest}"
         logger.error(err_msg)
         if UI_AVAILABLE and ui_window:
             ui_window.log_message(f"ERROR: Unable to copy and verify {pathlib.Path(src).name} after {max_retries} attempts.")
@@ -357,7 +357,7 @@ def verify_file_hashes(original, copy):
         original_hash = hashlib.md5(original_path.read_bytes()).hexdigest()
         logger.debug(f"Original MD5: {original_hash}")
 
-        logger.debug(f"Calculating MD5 for copy:  {copy}")
+        logger.debug(f"Calculating MD5 for copy: {copy}")
         copy_hash = hashlib.md5(copy_path.read_bytes()).hexdigest()
         logger.debug(f"Copy MD5: {copy_hash}")
 
@@ -405,7 +405,7 @@ def copy_locked_files(destination_folder: pathlib.Path):
             shadow_path = create_shadow_copy(f"{volume}\\")
             if ui_window:
                 ui_window.log_message(f"[+] Shadow Copy Device: {shadow_path}")
-            logger.info(f"VSS created successfully:  {shadow_path}")
+            logger.info(f"VSS created successfully: {shadow_path}")
         except Exception as vss_e:
             err_msg = f"[-] Failed to create shadow copy: {vss_e}"
             if ui_window:

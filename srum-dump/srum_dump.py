@@ -75,11 +75,11 @@ from config_manager import ConfigManager
 
 
 parser = argparse.ArgumentParser(description="Given an SRUM database it will create an XLS spreadsheet or CSV with analysis of the data in the database.")
-parser.add_argument("--SRUM_INFILE", "-i", help="Specify the ESE (. dat) file to analyze. Provide a valid path to the file.")
+parser.add_argument("--SRUM_INFILE", "-i", help="Specify the ESE (.dat) file to analyze. Provide a valid path to the file.")
 parser.add_argument("--OUT_DIR", "-o", help="Full path to a working output directory.")
 parser.add_argument("--REG_HIVE", "-r", help="If SOFTWARE registry hive is provided then the names of the network profiles will be resolved.")
-parser.add_argument("--ESE_ENGINE", "-e", choices=['pyesedb', 'dissect'], default=None, help="Corrupt file?  Try a different engine to see if it does better.  Options are pyesedb or dissect")
-parser.add_argument("--OUTPUT_FORMAT", "-f", choices=['xls', 'csv'], default=None, help="Specify the output format. Options are xls or csv.  Default is xls.")
+parser.add_argument("--ESE_ENGINE", "-e", choices=['pyesedb', 'dissect'], default=None, help="Corrupt file? Try a different engine to see if it does better. Options are pyesedb or dissect")
+parser.add_argument("--OUTPUT_FORMAT", "-f", choices=['xls', 'csv'], default=None, help="Specify the output format. Options are xls or csv. Default is xls.")
 parser.add_argument("--DEBUG","-v", action="store_true",help="Enable verbose logging in srum_dump.log")
 parser.add_argument("--NO_CONFIRM","-q", action="store_true",help="Do not show the confirmation dialog box.")
 options = parser.parse_args()
@@ -163,7 +163,7 @@ file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(log_formatter)
 logger.addHandler(file_handler)
-logger.info(f"Logging initialized.  Log file: {log_file_path}")
+logger.info(f"Logging initialized. Log file: {log_file_path}")
 logger.info(f"Using options: {options}")
 # --- End File Handler Configuration ---
 
@@ -223,7 +223,7 @@ config.delete_config("known_sids")
 config.set_config("SRUDbIdMapTable", ese_db.id_lookup)
 config.save() 
 
-#Let User confirm the settings and paths.   Then save for reuse next time
+#Let User confirm the settings and paths.  Then save for reuse next time
 if not options.NO_CONFIRM:
     if UI_AVAILABLE:
         get_user_input(options)
@@ -315,7 +315,7 @@ try:  # Start of the main processing block
             display_names.extend( calculated_columns.keys() )
             column_names.extend( calculated_columns.keys() )
 
-        #Set Column Widths.  Default to column name width - Override based on column_markups config
+        #Set Column Widths. Default to column name width - Override based on column_markups config
         #This must be done before the worksheet is created
         column_widths = [len(display_name) for display_name in display_names]
         for scol,swidth in specified_widths.items():
@@ -349,17 +349,17 @@ try:  # Start of the main processing block
                         new_row.append( val )
                     elif out_format == "APPID":
                         val = app_ids.get(str(embedded_value),'')
-                        new_row.append(val)
+                        new_row.append( val )
                     elif out_format == "SID":
                         val = app_ids.get(str(embedded_value),'')
                         new_row.append(val)
                     elif out_format == "OLE":
                         val = helpers.ole_timestamp(embedded_value)
                         cell_formats[position] = "datetime"
-                        new_row.append(val)
+                        new_row.append( val )
                     elif out_format == "seconds":
                         val = embedded_value/86400.0
-                        new_row.append(val)
+                        new_row.append( val )
                     elif out_format.startswith("FILE:"):
                         val = helpers.file_timestamp(embedded_value)
                         cell_formats[position] = "datetime"
@@ -395,8 +395,8 @@ try:  # Start of the main processing block
                             result = max(result, 0)
                             formula = formula.replace(calc, str(result))
                         value = formula.replace('#ROW_NUM#', str(table_count + 1))
-                        new_row.append(value)
-                        cell_formats.append(current_markups.get(col).get("style"))
+                        new_row.append( value )
+                        cell_formats.append( current_markups.get(col).get("style") )
 
                 #add the new row to the table
                 output.new_entry(worksheet, new_row, cell_formats)
@@ -406,19 +406,19 @@ try:  # Start of the main processing block
             progress.log_message(f"Table {table_name} contained {table_count} records.\n")
 
     progress.set_current_table(f"Writing Output Files.")
-    progress.log_message(f"Writing Output Files...   Please be patient\n")
+    progress.log_message(f"Writing Output Files...  Please be patient\n")
     progress.log_message(next(ads))
     output.save()
     progress.log_message(next(ads))
     progress.set_current_table(f"Finished")
-    progress.log_message(f"Finished!   Total Records: {read_count}.\n")
+    progress.log_message(f"Finished!  Total Records: {read_count}.\n")
     progress.finished()
     logger.info("Main processing finished successfully.")
     # --- End of Finalization steps ---
 
 except Exception as main_exception:  # Aligned with the 'try' approximatly on line 170 (main loop)
     logger.exception(f"An unexpected error occurred during main processing: {main_exception}")
-    error_message_box("CRITICAL ERROR", f"An unexpected error occurred:  {main_exception}\nCheck the log file for details:\n{log_file_path}")
+    error_message_box("CRITICAL ERROR", f"An unexpected error occurred: {main_exception}\nCheck the log file for details:\n{log_file_path}")
 finally:  # Aligned with the 'try' approximatly on line 170 (main loop)
     if UI_AVAILABLE and 'progress' in locals() and progress.root:
         try:

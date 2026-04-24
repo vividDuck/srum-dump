@@ -53,7 +53,7 @@ def open_file_with_default_app(file_path):
 
 class ProgressWindow: 
     def __init__(self, title="SRUM Dump Progress"):
-        logger.debug(f"Initializing ProgressWindow with title:  {title}")
+        logger.debug(f"Initializing ProgressWindow with title: {title}")
         try:
             self.root = tk.Tk()
             self.root.title(title)
@@ -65,7 +65,7 @@ class ProgressWindow:
                 logger.exception("Icon file not found or invalid.")
 
             # Current table label
-            self.table_label = tk.Label(self.root, text="Preparing to dump tables .. .", font=('Arial', 10))
+            self.table_label = tk.Label(self.root, text="Preparing to dump tables ...", font=('Arial', 10))
             self.table_label.pack(pady=5)
 
             # Progress bar frame
@@ -211,7 +211,7 @@ class ProgressWindow:
                 self.rps_label.pack_forget()
             logger.debug("Record stats hidden.")
         except Exception as e:
-            logger.exception(f"Error in hide_record_stats:  {e}")
+            logger.exception(f"Error in hide_record_stats: {e}")
 
     def finished(self):
         """Enable the close button when processing is complete"""
@@ -300,7 +300,7 @@ def browse_directory(initial_dir):
         resolved_initial_dir = str(pathlib.Path(initial_dir).resolve())
         logger.debug(f"Resolved initial directory: {resolved_initial_dir}")
         directory_path = filedialog.askdirectory(initialdir=resolved_initial_dir)
-        logger.info(f"Directory dialog returned:  {directory_path}")
+        logger.info(f"Directory dialog returned: {directory_path}")
         if directory_path:
             resolved_path = str(pathlib.Path(directory_path).resolve())
             logger.debug(f"Resolved directory path: {resolved_path}")
@@ -368,7 +368,7 @@ def get_user_input(options):
             logger.exception(f"Error removing topmost attribute for main input window: {e}")
 
     def on_cancel():
-        logger.debug("User clicked CANCEL.  Existing program.")
+        logger.debug("User clicked CANCEL. Existing program.")
         root.destroy()
         sys.exit(1)
 
@@ -431,7 +431,7 @@ def get_user_input(options):
             logger.debug("Logo image loaded.")
         else:
             tk.Label(logo_frame, text="SRUM DUMP Logo").pack()
-            logger.warning(f"Logo image not found at:  {image_path}")
+            logger.warning(f"Logo image not found at: {image_path}")
 
         # Main content frame
         content_frame = tk.Frame(root)
@@ -535,7 +535,7 @@ def get_user_input(options):
         try:
             messagebox.showerror("Fatal Error", f"Could not initialize the main input window:\n{e}")
         except:
-            logger.exception(f"FATAL ERROR: Could not initialize the main input window:  {e}", file=sys.stderr)
+            logger.exception(f"FATAL ERROR: Could not initialize the main input window: {e}", file=sys.stderr)
         sys.exit(1)
 
     logger.debug("Exiting get_user_input function.")
