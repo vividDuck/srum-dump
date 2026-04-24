@@ -22,14 +22,8 @@ git clone https://github.com/vividDuck/srum-dump.git
 cd srum-dump
 ```
 
-**Windows:**
 ```bash
 pip install -r requirements.txt
-```
-
-**Linux / macOS:**
-```bash
-pip install -r requirements-linux.txt
 ```
 
 Python 3.12 or later is required.
